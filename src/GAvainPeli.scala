@@ -12,6 +12,7 @@ import scala.collection.mutable.Buffer
 
  object GavainPeli extends SimpleSwingApplication{
   
+  
    def top = new MainFrame {
       title    = "nuotit G-avaimella"
       contents = new kuvaPaneeli
@@ -23,21 +24,23 @@ import scala.collection.mutable.Buffer
   
 class kuvaPaneeli extends Panel {
    
-  var nuotitYAkselilla = Buffer[Int]()
-  var score = 0  
-  var kysytty = 0
-  var oikein =  false
-  var randomNuottienMaara = 13
-  var aluettaSiirretaanNollasta = 0  // offset
-  var mouseClickedCount = 0
-  val oikeaVastaus = Map(12 -> "c", 11 -> "d", 10 -> "e", 9 -> "f", 8 -> "g", 7 -> "a",  6 -> "h", 5 -> "c", 4 -> "d", 
+   var nuotitYAkselilla = Buffer[Int]()
+   var score = 0  
+   var kysytty = 0
+   var oikein =  false
+   var randomNuottienMaara = 13
+   var aluettaSiirretaanNollasta = 0  // offset
+   var mouseClickedCount = 0
+   val oikeaVastaus = Map(12 -> "c", 11 -> "d", 10 -> "e", 9 -> "f", 8 -> "g", 7 -> "a",  6 -> "h", 5 -> "c", 4 -> "d", 
       3 -> "e", 2 -> "f", 1 -> "g", 0 -> "a")    // alin 12=keski-c; ylin 0 = a2
     
 //  clef = new BufferedImage(20, 90, BufferedImage.TYPE_INT_ARGB)   // numerot eivät vaikuta mihinkään
-   var clef = ImageIO.read(new File("treble_clef_small.png"))  
-   var note = ImageIO.read(new File("whole_note_small.png")) 
-   var thumb = ImageIO.read(new File("Thumbs_up_small.png")) 
-  
+   val clef = ImageIO.read(new File("treble_clef_small.png"))  
+   val note = ImageIO.read(new File("whole_note_small.png")) 
+   val thumb = ImageIO.read(new File("Thumbs_up_small.png")) 
+   
+   val player = new Player() 
+   
   this.listenTo(keys)
  // this.listenTo(this.mouse)
   listenTo(mouse.clicks)
@@ -50,6 +53,7 @@ class kuvaPaneeli extends Panel {
       if ('a' <= c.toLower && c.toLower <= 'h') {   
 	       pisteet(c)
 	       println(y)
+	       
       }
   }
   focusable = true
@@ -63,8 +67,10 @@ class kuvaPaneeli extends Panel {
            this.score += 1
            oikein = true
         } else oikein = false  
-        this.kysytty += 1   
+        this.kysytty += 1  
+        player.soita(this.y)
         this.y = (Math.random()*randomNuottienMaara).toInt  + aluettaSiirretaanNollasta 
+        
         this.repaint
    }
   
@@ -76,6 +82,10 @@ class kuvaPaneeli extends Panel {
       println(aluettaSiirretaanNollasta)
   }
   
+  def soita()= {
+    
+  }
+  
   
  
   override def paintComponent(g: Graphics2D) = {    
@@ -84,7 +94,7 @@ class kuvaPaneeli extends Panel {
     g.drawImage(note, 245, 12 +30* this.y, null) 
     if (y == 12) g.fillRect(235, 60*7, 125, 3)       // apuviivat
     if (y == 0) g.fillRect(235, 60, 125, 3)  
-    if (oikein)  g.drawImage(thumb, 350, 450, null) 
+    if (oikein)  g.drawImage(thumb, 360, 450, null) 
     
     for(i<- 1 to 5)                                // viivaston viivat
        g.fillRect(50, 60 + 60*i, 400, 3)
